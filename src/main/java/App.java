@@ -28,129 +28,121 @@ public class App {
         return "Hello world.";
     }
 
-    public static void main(String[] args) throws SunTimesException {
-        System.out.println(new App().getGreeting());
+        public static void main(String[] args) throws SunTimesException {
+            System.out.println(new App().getGreeting());
 
+            try {
+                String lat = "35.7201600";
+                String lon = "33.5203400";
+                String url = "https://api.sunrise-sunset.org/json?lat=" + lat + "&lng=" + lon;
+                URL obj = new URL(url);
 
-        try {
-            String lat = "35.7201600";
-            String lon = "33.5203400";
-            String url = "https://api.sunrise-sunset.org/json?lat=" + lat + "&lng=" + lon;
-            URL obj = new URL(url);
+                HttpURLConnection conn = (HttpURLConnection) obj.openConnection();
+                conn.setRequestMethod("GET");
+                conn.connect();
 
-            HttpURLConnection conn = (HttpURLConnection) obj.openConnection();
-            conn.setRequestMethod("GET");
-            conn.connect();
+                //Getting the response code
+                int responseCode = conn.getResponseCode();
 
-            //Getting the response code
-            int responseCode = conn.getResponseCode();
+                if (responseCode != 200) {
+                    throw new RuntimeException("HttpResponseCode: " + responseCode);
+                } else {
 
-            if (responseCode != 200) {
-                throw new RuntimeException("HttpResponseCode: " + responseCode);
-            } else {
+                    String inline = "";
+                    Scanner scanner = new Scanner(obj.openStream());
 
-                String inline = "";
-                Scanner scanner = new Scanner(obj.openStream());
+                    //Write all the JSON data into a string using a scanner
+                    while (scanner.hasNext()) {
+                        inline += scanner.nextLine();
+                    }
 
-                //Write all the JSON data into a string using a scanner
-                while (scanner.hasNext()) {
-                    inline += scanner.nextLine();
-                }
+                    //Close the scanner
+                    scanner.close();
 
-                //Close the scanner
-                scanner.close();
+                    //Using the JSON simple library parse the string into a json object
+                    JSONParser parse = new JSONParser();
+                    JSONObject data_obj = (JSONObject) parse.parse(inline);
 
-                //Using the JSON simple library parse the string into a json object
-//                JSONParser parse = new JSONParser()
-                JSONParser parse = new JSONParser();
-                JSONObject data_obj = (JSONObject) parse.parse(inline);
+                    //Get the required object from the above created object
+                    JSONObject obj2 = (JSONObject) data_obj.get("results");
 
-                //Get the required object from the above created object
-                JSONObject obj2 = (JSONObject) data_obj.get("results");
-
-                //Get the required data using its key
+                    //Get the required data using its key
 //                System.out.println(obj2.get("astronomical_twilight_end"));
-                LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm:ss");
-                String beforeFormat = now.format(format);
-                System.out.println("real time "+ beforeFormat);
+                    LocalDateTime now = LocalDateTime.now();
+                    DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm:ss");
+                    String beforeFormat = now.format(format);
+                    System.out.println("real time "+ beforeFormat);
 
-                String end = (String) obj2.get("astronomical_twilight_end");
-                String begin = (String) obj2.get("astronomical_twilight_begin");
-                //Format of the date defined in the input String
-                DateFormat df = new SimpleDateFormat("hh:mm:ss aa");
-                //Desired format: 24 hour format: Change the pattern as per the need
-                DateFormat outputformat = new SimpleDateFormat("HH:mm:ss");
-                Date beginDate = null;
-                Date endDate = null;
-                String beginOutput = null;
-                String endOutput = null;
-                try{
-                    //Converting the input String to Date
-                    beginDate= df.parse(begin);
-                    endDate= df.parse(end);
-                    //Changing the format of date and storing it in String
-                    beginOutput = outputformat.format(beginDate);
-                    endOutput = outputformat.format(endDate);
-                    //Displaying the date
-                    System.out.println("formated time to 24 hour begin  " +beginOutput);
-                    System.out.println("formated time to 24 hour end  " +endOutput);
+                    String end = (String) obj2.get("astronomical_twilight_end");
+                    String begin = (String) obj2.get("astronomical_twilight_begin");
+                    //Format of the date defined in the input String
+                    DateFormat df = new SimpleDateFormat("hh:mm:ss aa");
+                    //Desired format: 24 hour format: Change the pattern as per the need
+                    DateFormat outputformat = new SimpleDateFormat("HH:mm:ss");
+                    Date beginDate = null;
+                    Date endDate = null;
+                    String beginOutput = null;
+                    String endOutput = null;
+                    try{
+                        //Converting the input String to Date
+                        beginDate= df.parse(begin);
+                        endDate= df.parse(end);
+                        //Changing the format of date and storing it in String
+                        beginOutput = outputformat.format(beginDate);
+                        endOutput = outputformat.format(endDate);
+                        //Displaying the date
+                        System.out.println("formated time to 24 hour begin  " +beginOutput);
+                        System.out.println("formated time to 24 hour end  " +endOutput);
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-                    try {
-                        String string1 = beginOutput;
-                        Date time1 = new SimpleDateFormat("HH:mm:ss").parse(string1);
-                        Calendar calendar1 = Calendar.getInstance();
-                        calendar1.setTime(time1);
-                        calendar1.add(Calendar.DATE, 1);
+                        try {
+                            String string1 = beginOutput;
+                            Date time1 = new SimpleDateFormat("HH:mm:ss").parse(string1);
+                            Calendar calendar1 = Calendar.getInstance();
+                            calendar1.setTime(time1);
+                            calendar1.add(Calendar.DATE, 1);
 
 
-                        String string2 = endOutput;
-                        Date time2 = new SimpleDateFormat("HH:mm:ss").parse(string2);
-                        Calendar calendar2 = Calendar.getInstance();
-                        calendar2.setTime(time2);
-                        calendar2.add(Calendar.DATE, 1);
+                            String string2 = endOutput;
+                            Date time2 = new SimpleDateFormat("HH:mm:ss").parse(string2);
+                            Calendar calendar2 = Calendar.getInstance();
+                            calendar2.setTime(time2);
+                            calendar2.add(Calendar.DATE, 1);
 
-                        String someRandomTime = beforeFormat;
-                        Date d = new SimpleDateFormat("HH:mm:ss").parse(someRandomTime);
-                        Calendar calendar3 = Calendar.getInstance();
-                        calendar3.setTime(d);
-                        calendar3.add(Calendar.DATE, 1);
+                            String someRandomTime = beforeFormat;
+                            Date d = new SimpleDateFormat("HH:mm:ss").parse(someRandomTime);
+                            Calendar calendar3 = Calendar.getInstance();
+                            calendar3.setTime(d);
+                            calendar3.add(Calendar.DATE, 1);
 
-                        Date x = calendar3.getTime();
-                        while (true) {
-                            if(x.after(calendar1.getTime()) && x.before(calendar2.getTime())){
-                            //checkes whether the current time is between 14:49:00 and 20:11:13.
-                            System.out.println(1);
+                            Date x = calendar3.getTime();
+                            while (true) {
+                                if(x.after(calendar1.getTime()) && x.before(calendar2.getTime())){
+                                    //checkes whether the current time is between 14:49:00 and 20:11:13.
+                                    System.out.println(1);
 
-                        }else{
-                            System.out.println(0);
+                                }else{
+                                    System.out.println(0);
+                                }
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
                         }
-                    }
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.
 
 
-                }catch(ParseException pe){
-                    pe.printStackTrace();
+                    }catch(ParseException pe){
+                        pe.printStackTrace();
+                    }
                 }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-
 
 
     }
-
-
-
-
+ 
 }
